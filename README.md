@@ -44,21 +44,6 @@ This solution contains **two main projects**:
 
 ---
 
-## 📂 Solution Structure
-
-MultiTenant
-│
-├── WebApp # ASP.NET Core Web Application (Client)
-│
-├── WebApi # ASP.NET Core Web API (Protected Resource)
-│ ├── NSwag # API documentation & client generation
-│ └── ReDoc # API documentation UI
-│
-└── README.md
-
-
----
-
 ## 🚧 Current Status
 
 ✔ Solution created  
