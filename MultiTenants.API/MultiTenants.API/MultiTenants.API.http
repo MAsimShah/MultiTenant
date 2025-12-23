@@ -1,0 +1,21 @@
+@MultiTenants.API_HostAddress = http://localhost:5072
+
+### Login
+POST {{MultiTenants.API_HostAddress}}/AccountApi/Login
+Accept: application/json
+Content-Type: application/json
+{
+  "UserName": "Admin",
+  "Email": "admin@test.com"
+}
+
+
+### SignUp
+POST {{MultiTenants.API_HostAddress}}/AccountApi/SignUp
+Accept: application/json
+Content-Type: application/json
+{
+  "UserName": "NewUser",
+  "Email": "new@example.com",
+  "Password": "SecurePass123"
+}
