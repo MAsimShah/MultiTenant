@@ -1,0 +1,37 @@
+root = true
+
+[*.cs]
+# Indentation
+indent_style = space
+indent_size = 4
+
+# Expression-bodied members
+csharp_style_expression_bodied_methods = true:error
+csharp_style_expression_bodied_properties = true:error
+
+# -------------------------
+# Naming rules for properties
+# -------------------------
+dotnet_naming_rule.properties_should_be_pascal_case.severity = warning
+dotnet_naming_rule.properties_should_be_pascal_case.symbols = all_properties
+dotnet_naming_rule.properties_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.all_properties.applicable_kinds = property
+dotnet_naming_symbols.all_properties.applicable_accessibilities = public, private, protected, internal
+
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+# -------------------------
+# Naming rules for injected interface fields
+# -------------------------
+dotnet_naming_rule.injected_interfaces_should_start_with_underscore.severity = warning
+dotnet_naming_rule.injected_interfaces_should_start_with_underscore.symbols = injected_interfaces
+dotnet_naming_rule.injected_interfaces_should_start_with_underscore.style = underscore_pascal_case
+
+dotnet_naming_symbols.injected_interfaces.applicable_kinds = field
+dotnet_naming_symbols.injected_interfaces.required_modifiers = readonly
+dotnet_naming_symbols.injected_interfaces.applicable_accessibilities = private
+
+dotnet_naming_style.underscore_pascal_case.required_prefix = _
+dotnet_naming_style.underscore_pascal_case.capitalization = pascal_case
+
