@@ -3,8 +3,6 @@ name: MultiTenants
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
@@ -20,6 +18,15 @@ jobs:
     
     - name: Restore dependencies
       run: dotnet restore
+
+    # ===== Linting Steps =====
+    - name: Install dotnet-format
+      run: dotnet tool install -g dotnet-format
+
+    - name: Run dotnet format (check style)
+      run: dotnet format --verify-no-changes
+    # =========================
+      
     - name: Build
       run: dotnet build --no-restore --configuration Release
     
