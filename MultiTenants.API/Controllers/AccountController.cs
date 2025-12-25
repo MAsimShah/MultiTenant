@@ -8,7 +8,7 @@ namespace MultiTenants.API.Controllers
     public class AccountController : ControllerBase
     {
         [HttpPost("Login")]
-        public IActionResult Login([FromBody]LoginViewModel model)
+        public IActionResult Login([FromBody] LoginViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -23,13 +23,13 @@ namespace MultiTenants.API.Controllers
             return Ok(new { Success = false, Message = "Invalid Username or email" });
         }
         [HttpPost("SignUp")]
-        public IActionResult SignUp([FromBody]SignUpViewModel model)
+        public IActionResult SignUp([FromBody] SignUpViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-           
+
             return Ok(new { Success = true, Message = "SignUp successful" });
         }
     }

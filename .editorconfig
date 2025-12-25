@@ -5,11 +5,6 @@ root = true
 indent_style = space
 indent_size = 4
 
-# Require 'this.' for member access
-dotnet_style_qualification_for_field = true:error
-dotnet_style_qualification_for_property = true:error
-dotnet_style_qualification_for_method = true:error
-
 # Expression-bodied members
 csharp_style_expression_bodied_methods = true:error
 csharp_style_expression_bodied_properties = true:error
