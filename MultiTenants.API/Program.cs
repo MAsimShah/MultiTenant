@@ -1,7 +1,45 @@
+using DAL.ApplicationContext;
+using Duende.IdentityServer.Models;
+using Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Start - add Identity and Duende identity server
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddIdentityServer(options =>
+{
+    options.EmitStaticAudienceClaim = true;
+})
+.AddAspNetIdentity<ApplicationUser>()
+.AddInMemoryApiScopes(new[]
+{
+    new ApiScope("api.read", "Read Access")
+})
+.AddInMemoryClients(new[]
+{
+    new Client
+    {
+        ClientId = "client-app",
+        AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+        ClientSecrets = { new Secret("secret".Sha256()) },
+        AllowedScopes = { "api.read" }
+    }
+})
+.AddDeveloperSigningCredential();
+
+// END - add Identity and Duende identity server
+
+// Add services to the container.
 builder.Services.AddControllers();
 
 // implement NSwag for API documentation

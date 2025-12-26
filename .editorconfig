@@ -33,5 +33,5 @@ dotnet_naming_symbols.injected_interfaces.required_modifiers = readonly
 dotnet_naming_symbols.injected_interfaces.applicable_accessibilities = private
 
 dotnet_naming_style.underscore_pascal_case.required_prefix = _
-dotnet_naming_style.underscore_pascal_case.capitalization = pascal_case
+dotnet_naming_style.underscore_pascal_case.capitalization = camel_case
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using MultiTenants.API.Models;
 
 namespace MultiTenants.API.Controllers
@@ -7,6 +9,13 @@ namespace MultiTenants.API.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public AccountController(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
         [HttpPost("Login")]
         public IActionResult Login([FromBody] LoginViewModel model)
         {
@@ -22,15 +31,19 @@ namespace MultiTenants.API.Controllers
             }
             return Ok(new { Success = false, Message = "Invalid Username or email" });
         }
+
         [HttpPost("SignUp")]
-        public IActionResult SignUp([FromBody] SignUpViewModel model)
+        public async Task<IActionResult> SignUp([FromBody] SignUpViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            return Ok(new { Success = true, Message = "SignUp successful" });
+            var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            return result.Succeeded ? Ok(new { Success = true, Message = "SignUp successful" }) : BadRequest(result.Errors);
         }
     }
 }
