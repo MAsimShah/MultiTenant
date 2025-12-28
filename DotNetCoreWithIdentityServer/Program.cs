@@ -1,4 +1,6 @@
 using DAL.ApplicationContext;
+using DAL.Interfaces;
+using DAL.Repositories;
 using Duende.IdentityServer.Models;
 using Entities;
 using Microsoft.AspNetCore.Identity;
@@ -44,6 +46,11 @@ builder.Services.AddControllers();
 
 // implement NSwag for API documentation
 builder.Services.AddOpenApiDocument();
+
+
+// register custom services
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddTransient<IAccountServices, AccountServices>();
 
 var app = builder.Build();
 

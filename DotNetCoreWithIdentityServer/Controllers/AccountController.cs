@@ -1,7 +1,7 @@
-﻿using Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using DAL.Interfaces;
 using DotNetCoreWithIdentityServer.Models;
+using DTO;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetCoreWithIdentityServer.Controllers
 {
@@ -9,11 +9,11 @@ namespace DotNetCoreWithIdentityServer.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAccountServices _accountService;
 
-        public AccountController(UserManager<ApplicationUser> userManager)
+        public AccountController(IAccountServices accountServices)
         {
-            _userManager = userManager;
+            _accountService = accountServices;
         }
 
         [HttpPost("Login")]
@@ -39,10 +39,10 @@ namespace DotNetCoreWithIdentityServer.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
+            SignupDTO signupDTO = new SignupDTO { UserName = model.UserName, Email = model.Email, Password = model.Password, PhoneNumber = model.PhoneNumber };
+            signupDTO = await _accountService.SignupUserAsync(signupDTO);
 
-            return result.Succeeded ? Ok(new { Success = true, Message = "SignUp successful" }) : BadRequest(result.Errors);
+            return signupDTO != null ? Ok(new { Success = true, Message = "SignUp successful." }) : BadRequest("Please try agian. User not successfully signup");
         }
     }
 }
