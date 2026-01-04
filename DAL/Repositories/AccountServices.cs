@@ -1,12 +1,29 @@
 ﻿using DAL.Interfaces;
 using DTO;
+using Duende.IdentityModel.Client;
 using Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace DAL.Repositories
 {
-    public class AccountServices(UserManager<ApplicationUser> _userManager) : IAccountServices
+    public class AccountServices : IAccountServices
     {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly HttpClient _httpClient;
+        private readonly IdentityServerOptions _options;
+
+        public AccountServices(
+            UserManager<ApplicationUser> userManager,
+            HttpClient httpClient,
+            IOptions<IdentityServerOptions> options) // <-- use IOptions<T>
+        {
+            _userManager = userManager;
+            _httpClient = httpClient;
+            _options = options.Value; // get the actual bound object
+        }
+
         public async Task<SignupDTO> SignupUserAsync(SignupDTO model)
         {
             ApplicationUser user = new ApplicationUser { UserName = model.Email, Email = model.Email, PasswordHash = model.Password, PhoneNumber = model.PhoneNumber };
@@ -19,7 +36,7 @@ namespace DAL.Repositories
             return model;
         }
 
-        public async Task<bool> IsUserExists(SignInDTO signInDTO)
+        public async Task<TokenResponseModel> IsUserExists(SignInDTO signInDTO)
         {
 
             if (string.IsNullOrEmpty(signInDTO.Email) || string.IsNullOrEmpty(signInDTO.Password))
@@ -34,9 +51,46 @@ namespace DAL.Repositories
                 throw new Exception("User not found.");
             }
 
-            return await _userManager.CheckPasswordAsync(user, signInDTO.Password);
+            bool isAuthenticatedUser = await _userManager.CheckPasswordAsync(user, signInDTO.Password);
+
+            if (!isAuthenticatedUser)
+            {
+                throw new Exception("Invalid credentials.");
+            }
+
+            return await GetTokenAsync(signInDTO.Email, signInDTO.Password);
         }
 
+        private async Task<TokenResponseModel> GetTokenAsync(string username, string password)
+        {
+            var parameters = new Dictionary<string, string>
+                                     {
+                                         { "grant_type", "password" },
+                                         { "client_id", _options.ClientId },
+                                         { "client_secret", _options.ClientSecret },
+                                         { "username", username },
+                                         { "password", password },
+                                         { "scope", _options.Scope }
+                                     };
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, _options.TokenEndpoint)
+            {
+                Content = new FormUrlEncodedContent(parameters)
+            };
+
+            HttpResponseMessage? response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            string? content = await response.Content.ReadAsStringAsync();
+            TokenResponseModel? tokenResponse = JsonSerializer.Deserialize<TokenResponseModel>(content);
+
+            if (tokenResponse is null)
+            {
+                throw new Exception("Token deserialization failed.");
+            }
+
+            return tokenResponse;
+        }
 
 
         private async Task SignIn(SignupDTO model)

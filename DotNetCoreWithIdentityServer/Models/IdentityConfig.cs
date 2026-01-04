@@ -33,21 +33,11 @@ namespace DotNetCoreWithIdentityServer.Models
                     RefreshTokenUsage = TokenUsage.OneTimeOnly,
                     RefreshTokenExpiration = TokenExpiration.Sliding,
                     SlidingRefreshTokenLifetime = 1296000, // 15 days
+                    AllowOfflineAccess = true,
 
                     RedirectUris = { "https://localhost:5002/signin-oidc" },
                     AllowedScopes = { "openid", "profile", "myapi" }
                 }
             };
-
-        public static List<TestUser> TestUsers =>
-    new List<TestUser>
-    {
-            new TestUser
-            {
-                SubjectId = "1",
-                Username = "alice",
-                Password = "password"
-            }
-    };
     }
 }

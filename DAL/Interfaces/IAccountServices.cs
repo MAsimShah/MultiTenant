@@ -6,6 +6,6 @@ namespace DAL.Interfaces
     {
         Task<SignupDTO> SignupUserAsync(SignupDTO model);
 
-        Task<bool> IsUserExists(SignInDTO signInDTO);
+        Task<TokenResponseModel> IsUserExists(SignInDTO signInDTO);
     }
 }
