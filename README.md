@@ -77,10 +77,10 @@ The project uses **PostgreSQL** with two separate contexts sharing the same data
 
 2. **Duende IdentityServer operational tables** (`PersistedGrantDbContext` – for refresh tokens, codes, etc.)
    ```bash
-  Add-Migration "InitialIdentityServerPersistedGrants" -Context PersistedGrantDbContext -OutputDir Data/Migrations/IdentityServer
-  Update-Database -Context PersistedGrantDbContext
+   Add-Migration "InitialIdentityServerPersistedGrants" -Context PersistedGrantDbContext -OutputDir Data/Migrations/IdentityServer
+   Update-Database -Context PersistedGrantDbContext
 
-- These commands create tables such as AspNetUsers, AspNetRoles, PersistedGrants, DeviceCodes, and Keys.
+These commands create tables such as AspNetUsers, AspNetRoles, PersistedGrants, DeviceCodes, and Keys.
 
 🚀 ## Running the Project
 1. Update appsettings.json with your PostgreSQL connection string
