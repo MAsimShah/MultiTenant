@@ -7,5 +7,7 @@ namespace DAL.Interfaces
         Task<SignupDTO> SignupUserAsync(SignupDTO model);
 
         Task<TokenResponseModel> IsUserExists(SignInDTO signInDTO);
+
+        Task<TokenResponseModel> RefreshTokenAsync(string refreshToken);
     }
 }

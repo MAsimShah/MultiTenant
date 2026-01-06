@@ -14,6 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+var identityOptions = builder.Configuration
+    .GetSection("IdentityServer")
+    .Get<IdentityServerOptions>();
+
 // Start - add Identity and Duende identity server
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
@@ -56,7 +60,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer("Bearer", options =>
 {
-    options.Authority = "https://localhost:7164";
+    options.Authority = identityOptions?.Authority;
     options.RequireHttpsMetadata = false;
     options.TokenValidationParameters.ValidateAudience = false;
 });
@@ -79,7 +83,7 @@ builder.Services.AddOpenApiDocument(config =>
     {
         Type = NSwag.OpenApiSecuritySchemeType.OAuth2,
         Flow = NSwag.OpenApiOAuth2Flow.Password,
-        TokenUrl = "https://localhost:7164/connect/token",
+        TokenUrl = identityOptions?.TokenEndpoint,
         Scopes = new Dictionary<string, string>
         {
             { "myapi", "Access My API" }

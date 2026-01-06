@@ -1,6 +1,5 @@
 ﻿using DAL.Interfaces;
 using DTO;
-using Duende.IdentityModel.Client;
 using Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -58,10 +57,22 @@ namespace DAL.Repositories
                 throw new Exception("Invalid credentials.");
             }
 
-            return await GetTokenAsync(signInDTO.Email, signInDTO.Password);
+            return await GenerateNewTokenAsync(signInDTO.Email, signInDTO.Password);
         }
 
-        private async Task<TokenResponseModel> GetTokenAsync(string username, string password)
+        public async Task<TokenResponseModel> RefreshTokenAsync(string refreshToken)
+        {
+            var parameters = new Dictionary<string, string>
+                                     {
+                                         { "grant_type", "refresh_token" },
+                                         { "client_id", _options.ClientId },
+                                         { "client_secret", _options.ClientSecret },
+                                         { "refresh_token", refreshToken }
+                                     };
+            return await GenerateToken(parameters);
+        }
+
+        private async Task<TokenResponseModel> GenerateNewTokenAsync(string username, string password)
         {
             var parameters = new Dictionary<string, string>
                                      {
@@ -73,6 +84,11 @@ namespace DAL.Repositories
                                          { "scope", _options.Scope }
                                      };
 
+            return await GenerateToken(parameters);
+        }
+
+        private async Task<TokenResponseModel> GenerateToken(Dictionary<string, string> parameters)
+        {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, _options.TokenEndpoint)
             {
                 Content = new FormUrlEncodedContent(parameters)
@@ -90,44 +106,6 @@ namespace DAL.Repositories
             }
 
             return tokenResponse;
-        }
-
-
-        private async Task SignIn(SignupDTO model)
-        {
-            // Validate user
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            //if (user == null)
-            //    return BadRequest(new { Message = "Invalid email or password" });
-
-            var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
-            //if (!passwordValid)
-            //    return BadRequest(new { Message = "Invalid email or password" });
-
-            // Create a token request (Resource Owner Password flow)
-            //var tokenRequest = new Duende.IdentityServer.Models.TokenRequest
-            //{
-            //    GrantType = "password",
-            //    ClientId = "web-client",
-            //    ClientSecret = "super-secret",
-            //    Parameters =
-            //{
-            //    { "username", model.Email },
-            //    { "password", model.Password },
-            //    { "scope", "openid profile myapi offline_access" } // offline_access = refresh token
-            //}
-            //};
-
-            // Normally, clients call /connect/token directly.
-            // For internal call, we can simulate with HttpClient or call IdentityServer's Token endpoint
-            // Here, simplest approach: direct client calls /connect/token externally.
-
-            //return Ok(new
-            //{
-            //    Message = "Login successful",
-            //    TokenEndpoint = "https://localhost:5001/connect/token",
-            //    Info = "Client should call this endpoint with Resource Owner Password flow to get access & refresh token."
-            //});
         }
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetCoreWithIdentityServer.Controllers
 {
-    [AllowAnonymous]
     [Route("[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -50,10 +49,32 @@ namespace DotNetCoreWithIdentityServer.Controllers
             {
                 return BadRequest(ModelState);
             }
-            SignupDTO signupDTO = new SignupDTO { UserName = model.UserName, Email = model.Email, Password = model.Password, PhoneNumber = model.PhoneNumber };
+
+            SignupDTO signupDTO = new() { UserName = model.UserName, Email = model.Email, Password = model.Password, PhoneNumber = model.PhoneNumber };
             signupDTO = await _accountService.SignupUserAsync(signupDTO);
 
             return signupDTO != null ? Ok(new { Success = true, Message = "SignUp successful." }) : BadRequest("Please try agian. User not successfully signup");
+        }
+
+        [Authorize]
+        [HttpPost("refreshtoken")]
+        public async Task<IActionResult> RefreshToken([FromForm] string refreshToken)
+        {
+            var client = new HttpClient();
+
+            var tokenResponse = await _accountService.RefreshTokenAsync(refreshToken);
+
+            if (tokenResponse is null)
+            {
+                return BadRequest("Token not generated.");
+            }
+
+            return Ok(new
+            {
+                access_token = tokenResponse.AccessToken,
+                refresh_token = tokenResponse.RefreshToken,
+                expires_in = tokenResponse.ExpiresIn
+            });
         }
     }
 }
