@@ -107,7 +107,6 @@ builder.Services.AddHttpClient<IAccountServices, AccountServices>()
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<IAccountServices, AccountServices>();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
